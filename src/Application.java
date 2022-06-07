@@ -1,5 +1,8 @@
 package src;
 
+import src.model.Address;
+import src.model.Person;
+
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -125,117 +128,6 @@ public class Application {
                 .sorted(Map.Entry.comparingByValue())
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-    }
-
-    private static class Person {
-        private String fname;
-        private String lanme;
-        private Address address;
-        private List<Integer> phoneNumber;
-        private int age;
-
-        public Person(String fname, String lanme, Address address, List<Integer> phoneNumber,int age) {
-            this.fname = fname;
-            this.lanme = lanme;
-            this.address = address;
-            this.phoneNumber = phoneNumber;
-            this.age=age;
-        }
-
-        public String getFname() {
-            return fname;
-        }
-
-        public void setFname(String fname) {
-            this.fname = fname;
-        }
-
-        public String getLanme() {
-            return lanme;
-        }
-
-        public void setLanme(String lanme) {
-            this.lanme = lanme;
-        }
-
-        public Address getAddress() {
-            return address;
-        }
-
-        public void setAddress(Address address) {
-            this.address = address;
-        }
-
-        public List<Integer> getPhoneNumber() {
-            return phoneNumber;
-        }
-
-        public void setPhoneNumber(List<Integer> phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
-
-        @Override
-        public String toString() {
-            return "Person{" +
-                    "fname='" + fname + '\'' +
-                    ", lanme='" + lanme + '\'' +
-                    ", address=" + address +
-                    ", phoneNumber=" + phoneNumber +
-                    '}';
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-    }
-
-    private static class Address {
-        private String state;
-        private String city;
-        private Integer pincode;
-
-        public Address(String state, String city, Integer pincode) {
-            this.state = state;
-            this.city = city;
-            this.pincode = pincode;
-        }
-
-        public String getState() {
-            return state;
-        }
-
-        public void setState(String state) {
-            this.state = state;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
-        public void setCity(String city) {
-            this.city = city;
-        }
-
-        public Integer getPincode() {
-            return pincode;
-        }
-
-        public void setPincode(Integer pincode) {
-            this.pincode = pincode;
-        }
-
-        @Override
-        public String toString() {
-            return "Address{" +
-                    "state='" + state + '\'' +
-                    ", city='" + city + '\'' +
-                    ", pincode=" + pincode +
-                    '}';
-        }
     }
 
 }
