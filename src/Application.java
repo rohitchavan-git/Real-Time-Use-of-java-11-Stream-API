@@ -22,11 +22,12 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static src.repo.PersonRepo.getPeoples;
 
 public class Application {
 
     private static final String OSMANABAD = "Osmanabad";
-    private static final String StartingWithO = "O";
+    private static final String STARTING_WITH_R = "r";
 
     public static void main(String[] args) {
         List<Person> peoples = getPeoples();
@@ -62,7 +63,7 @@ public class Application {
         System.out.println(peoples.stream()
                 .collect(groupingBy(Person::getAge,
                         mapping(Person::getFname,
-                                filtering(name->name.startsWith("r"),
+                                filtering(name->name.startsWith(STARTING_WITH_R),
                                         toList())))));
     }
 
@@ -91,16 +92,6 @@ public class Application {
         return peoples.stream()
                 .filter(personPredicate)
                 .collect(toList());
-    }
-
-    private static List<Person> getPeoples() {
-        return   List.of(new Person("rohit", "chavan", new Address("MH", "Osmanabad", 413501), List.of(80586, 805432),25),
-                new Person("urmila", "chavan", new Address("MH", "Pune", 411057), List.of(80585, 805431),25),
-                new Person("Rahul", "chavan", new Address("MH", "Osmanabad", 54666), List.of(80544, 845432),22),
-                new Person("Amol", "gade", new Address("MH", "shirdi", 76549), List.of(9875, 6744),25),
-                new Person("ram", "cena", new Address(null, "USA", 413501), List.of(80586, 805432),43),
-                new Person("randy", "ortan", null, List.of(80586, 805432),32),
-                new Person("rko", "chavan", new Address("MH", null, 413501), null,24));
     }
 
     private static LinkedHashMap<String, Integer> streamOnMapCollection() {

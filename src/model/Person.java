@@ -28,10 +28,6 @@ public class Person {
         return fname;
     }
 
-    public String getLanme() {
-        return lanme;
-    }
-
     public Address getAddress() {
         return address;
     }

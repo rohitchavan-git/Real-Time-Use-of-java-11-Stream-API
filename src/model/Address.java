@@ -12,16 +12,8 @@ public class Address {
         this.pincode = pincode;
     }
 
-    public String getState() {
-        return state;
-    }
-
     public String getCity() {
         return city;
-    }
-
-    public Integer getPincode() {
-        return pincode;
     }
 
     @Override
