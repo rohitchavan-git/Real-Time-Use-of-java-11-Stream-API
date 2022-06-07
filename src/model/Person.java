@@ -1,6 +1,9 @@
 package src.model;
 
 import java.util.List;
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 public class Person {
     private final String fname;
@@ -15,6 +18,10 @@ public class Person {
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.age = age;
+    }
+
+    public Optional<Address> getOptionalAddress() {
+        return ofNullable(getAddress());
     }
 
     public String getFname() {

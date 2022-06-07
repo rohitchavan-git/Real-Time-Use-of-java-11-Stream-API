@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
@@ -32,30 +33,21 @@ public class Application {
 
         // city wise grp by and find how many peoples in each city start with 'O'
 
-        System.out.println(peoples.stream()
-                .map(Person::getAddress)
-                .filter(Objects::nonNull)
-                .map(Address::getCity)
-                .filter(Objects::nonNull)
-                .collect(toList()));
+        List<String> listOfCity  = peoples.stream()
+                                            .map(Person::getAddress)
+                                            .filter(Objects::nonNull)
+                                            .map(Address::getCity)
+                                            .filter(Objects::nonNull)
+                                        .collect(toList());
+
+        System.out.println(listOfCity);
 
     }
 
-    private static void grpByCityCountCityStartWithO(List<Person> peoples) {
-
-        Predicate<Person> personFilter = person11 -> Optional.ofNullable(person11.getAddress())
-                .map(Address::getCity)
-                .filter(city -> city.startsWith(StartingWithO))
-                .isPresent();
-        System.out.println(peoples.stream()
-                .filter(personFilter)
-                .collect(groupingBy(perosn -> perosn.getAddress().getCity(), counting() )));
-    }
-
-    private static void getMAXByAge(List<Person> peoples) {
-        System.out.println(peoples.stream()
+    private static Person getMAXByAge(List<Person> peoples) {
+        return peoples.stream()
                 .max(Comparator.comparing(Person::getAge))
-                .orElse(null));
+                .orElse(null);
     }
 
     private static Map<Integer, Set<Integer>> getIntegerSetMap(List<Person> peoples) {
@@ -74,32 +66,31 @@ public class Application {
                                         toList())))));
     }
 
-    private static void groupByAgeFindCount(List<Person> peoples) {
-        System.out.println(peoples.stream()
+    private static Map<Integer, Integer> groupByAgeFindCount(List<Person> peoples) {
+        return peoples.stream()
                 .collect(groupingBy(Person::getAge,
-                        collectingAndThen(counting(), Long::intValue))));
+                        collectingAndThen(counting(), Long::intValue)));
     }
 
-    private static void getListOfCity(List<Person> peoples) {
-        Set<String> listOfCity = peoples.stream()
-                .map(person -> Optional.ofNullable(person)
-                        .flatMap(person1 -> Optional.ofNullable(person1.getAddress()))
-                        .map(Address::getCity))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(toSet());
+    private static Set<String> getListOfCity(List<Person> peoples) {
 
-        System.out.println(listOfCity);
+        return peoples.stream()
+                            .map(person -> ofNullable(person)
+                                    .flatMap(Person::getOptionalAddress )
+                                    .map(Address::getCity))
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                      .collect(toSet());
     }
 
-    private static void getListOfPersonTryLiveInOsmanabad(List<Person> peoples) {
-        Predicate<Person> personPredicate = person1 -> Optional.ofNullable(person1)
-                .flatMap(nonNullPerson -> Optional.ofNullable(nonNullPerson.getAddress()))
-                .map(Address::getCity).filter(OSMANABAD::equals)
-                .isPresent();
-        System.out.println(peoples.stream()
+    private static List<Person> getListOfPersonTryLiveInOsmanabad(List<Person> peoples) {
+        Predicate<Person> personPredicate = person1 -> ofNullable(person1)
+                .flatMap(Person::getOptionalAddress)
+                .map(Address::getCity)
+                .filter(OSMANABAD::equals).isPresent();
+        return peoples.stream()
                 .filter(personPredicate)
-                .collect(toList()));
+                .collect(toList());
     }
 
     private static List<Person> getPeoples() {
@@ -112,15 +103,14 @@ public class Application {
                 new Person("rko", "chavan", new Address("MH", null, 413501), null,24));
     }
 
-    private static void streamOnMapCollection() {
-        Map<String, Integer> stringIntegerMap = Map.of("Math", 99, "sec",
-                98, "java", 96, "c++", 92, "opp", 89);
+    private static LinkedHashMap<String, Integer> streamOnMapCollection() {
 
-        sortMapByValue(stringIntegerMap);
+        return sortMapByValue(Map.of("Math", 99, "sec",
+                98, "java", 96, "c++", 92, "opp", 89));
     }
 
-    private static void sortMapByValue(Map<String, Integer> stringIntegerMap) {
-        System.out.println(getSortedByValue(stringIntegerMap));
+    private static LinkedHashMap<String, Integer> sortMapByValue(Map<String, Integer> stringIntegerMap) {
+        return getSortedByValue(stringIntegerMap);
     }
 
     private static LinkedHashMap<String, Integer> getSortedByValue(Map<String, Integer> stringIntegerMap) {
@@ -130,4 +120,11 @@ public class Application {
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 
+    private Map<String, Long> grpByCityGetCount(List<Person> peoples, Predicate<Person> isCity) {
+
+        return peoples.stream()
+                        .filter(isCity)
+                        .collect(groupingBy(perosn -> perosn.getAddress().getCity()
+                            , counting()));
+    }
 }
