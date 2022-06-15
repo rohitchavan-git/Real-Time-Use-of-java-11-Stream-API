@@ -9,6 +9,8 @@ public class PersonBuilder {
     private List<Integer> phoneNumber;
     private int age;
 
+    private  String status;
+
     public static PersonBuilder aPerson(){
         return new PersonBuilder();
     }
@@ -38,7 +40,12 @@ public class PersonBuilder {
         return this;
     }
 
+    public PersonBuilder status(String status) {
+        this.status = status;
+        return this;
+    }
+
     public Person build() {
-        return new Person(fname, lanme, address, phoneNumber, age);
+        return new Person(fname, lanme, address, phoneNumber, age,status);
     }
 }

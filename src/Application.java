@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
@@ -34,14 +35,12 @@ public class Application {
 
         // city wise grp by and find how many peoples in each city start with 'O'
 
-        List<String> listOfCity  = peoples.stream()
+        System.out.println(peoples.stream()
                                             .map(Person::getAddress)
                                             .filter(Objects::nonNull)
                                             .map(Address::getCity)
                                             .filter(Objects::nonNull)
-                                        .collect(toList());
-
-        System.out.println(listOfCity);
+                                        .collect(toList()));
 
     }
 
@@ -73,12 +72,16 @@ public class Application {
                         collectingAndThen(counting(), Long::intValue)));
     }
 
+
+
+
     private static Set<String> getListOfCity(List<Person> peoples) {
 
+        Function<Person, Optional<String>> personOptionalFunction = person1 -> ofNullable(person1)
+                .flatMap(Person::getOptionalAddress)
+                .map(Address::getCity);
         return peoples.stream()
-                            .map(person -> ofNullable(person)
-                                    .flatMap(Person::getOptionalAddress )
-                                    .map(Address::getCity))
+                            .map(personOptionalFunction)
                             .filter(Optional::isPresent)
                             .map(Optional::get)
                       .collect(toSet());

@@ -12,12 +12,15 @@ public class Person {
     private final List<Integer> phoneNumber;
     private final int age;
 
-    public Person(String fname, String lanme, Address address, List<Integer> phoneNumber, int age) {
+    private final String status;
+
+    public Person(String fname, String lanme, Address address, List<Integer> phoneNumber, int age,String status) {
         this.fname = fname;
         this.lanme = lanme;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.age = age;
+        this.status=status;
     }
 
     public Optional<Address> getOptionalAddress() {
@@ -50,4 +53,7 @@ public class Person {
                 '}';
     }
 
+    public String getStatus() {
+        return status;
+    }
 }
