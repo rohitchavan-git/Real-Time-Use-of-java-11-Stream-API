@@ -29,8 +29,10 @@ public class Application {
 
         // max person by age per first name character
 
-        Function<Person, Character> personCharacterFunction = person1 -> ofNullable(person1.getFname())
-                .map(name -> name.charAt(0)).orElse(null);
+        Function<Person, Character> personCharacterFunction =
+                person1 -> ofNullable(person1.getFname())
+                                .map(name -> name.charAt(0))
+                                .orElse(null);
 
         Comparator<Person> compareByAge = Comparator.comparing(Person::getAge);
 
