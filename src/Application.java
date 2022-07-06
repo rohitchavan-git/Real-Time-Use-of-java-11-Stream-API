@@ -1,6 +1,7 @@
 package src;
 
 import src.model.Address;
+import src.model.ContactWrapper;
 import src.model.Person;
 
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -31,17 +33,44 @@ public class Application {
     private static final String STARTING_WITH_R = "r";
 
     public static void main(String[] args) {
+
         List<Person> peoples = getPeoples();
 
+
+        List<String> collect = peoples
+                .stream()
+                .map(Person::getFname)
+                .filter(Objects::nonNull).collect(toList());
+
+        System.out.println(collect);
+
+
+        List<ContactWrapper> contactWrappers = peoples.stream()
+                .map(Person::getContactWrapper)
+                .flatMap(Stream::ofNullable)
+                .flatMap(List::stream)
+                .collect(toList());
+
+        List<Integer> listOfNumber = contactWrappers.stream()
+                .map(contactWrapper -> ofNullable(contactWrapper)
+                        .map(ContactWrapper::getPhoneNumber))
+                .flatMap(Optional::stream)
+                .collect(toList());
+
+        System.out.println(listOfNumber);
+
+    }
+
+    private static void filterForNullCheck(List<Person> peoples) {
         // city wise grp by and find how many peoples in each city start with 'O'
 
-        System.out.println(peoples.stream()
-                                            .map(Person::getAddress)
-                                            .filter(Objects::nonNull)
-                                            .map(Address::getCity)
-                                            .filter(Objects::nonNull)
-                                        .collect(toList()));
-
+        List<String> collect = peoples.stream()
+                .map(Person::getAddress)
+                .filter(Objects::nonNull)
+                .map(Address::getCity)
+                .filter(Objects::nonNull)
+                .collect(toList());
+        System.out.println(collect);
     }
 
     private static Person getMAXByAge(List<Person> peoples) {
@@ -54,7 +83,8 @@ public class Application {
         return peoples.stream()
                 .collect(groupingBy(Person::getAge,
                         filtering(p -> p.getPhoneNumber() != null,
-                                flatMapping(p -> p.getPhoneNumber().stream(), toSet()))));
+                                flatMapping(p -> p.getPhoneNumber().stream(),
+                                        toSet()))));
 
     }
 
@@ -91,7 +121,8 @@ public class Application {
         Predicate<Person> personPredicate = person1 -> ofNullable(person1)
                 .flatMap(Person::getOptionalAddress)
                 .map(Address::getCity)
-                .filter(OSMANABAD::equals).isPresent();
+                .filter(OSMANABAD::equals)
+                .isPresent();
         return peoples.stream()
                 .filter(personPredicate)
                 .collect(toList());
@@ -115,10 +146,16 @@ public class Application {
     }
 
     private Map<String, Long> grpByCityGetCount(List<Person> peoples, Predicate<Person> isCity) {
-
         return peoples.stream()
                         .filter(isCity)
-                        .collect(groupingBy(perosn -> perosn.getAddress().getCity()
+                        .collect(groupingBy(this::getCity
                             , counting()));
+    }
+
+    private String getCity(Person perosn) {
+        return ofNullable(perosn)
+                .flatMap(Person::getOptionalAddress)
+                .map(Address::getCity)
+                .orElse("");
     }
 }

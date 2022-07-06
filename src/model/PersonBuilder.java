@@ -1,6 +1,8 @@
 package src.model;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PersonBuilder {
     private String fname;
@@ -46,6 +48,18 @@ public class PersonBuilder {
     }
 
     public Person build() {
-        return new Person(fname, lanme, address, phoneNumber, age,status);
+
+        return new Person(fname, lanme, address, getContactWrappers(), age, status);
+    }
+
+    private List<ContactWrapper> getContactWrappers() {
+        if (phoneNumber != null) {
+            return phoneNumber.stream()
+                    .flatMap(Stream::ofNullable)
+                    .map(ContactWrapper::new)
+                    .collect(Collectors.toList());
+
+        }
+        return null;
     }
 }

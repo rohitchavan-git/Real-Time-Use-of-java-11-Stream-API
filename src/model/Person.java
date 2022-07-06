@@ -2,19 +2,21 @@ package src.model;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
+
 
 public class Person {
     private final String fname;
     private final String lanme;
     private final Address address;
-    private final List<Integer> phoneNumber;
+    private final List<ContactWrapper> phoneNumber;
     private final int age;
-
     private final String status;
 
-    public Person(String fname, String lanme, Address address, List<Integer> phoneNumber, int age,String status) {
+    public Person(String fname, String lanme, Address address, List<ContactWrapper> phoneNumber, int age,String status) {
         this.fname = fname;
         this.lanme = lanme;
         this.address = address;
@@ -36,7 +38,16 @@ public class Person {
     }
 
     public List<Integer> getPhoneNumber() {
-        return phoneNumber;
+        return this.phoneNumber.stream()
+                .flatMap(Stream::ofNullable)
+                .map(ContactWrapper::getPhoneNumber)
+                .collect(Collectors.toList());
+
+    }
+
+
+    public List<ContactWrapper>  getContactWrapper() {
+        return this.phoneNumber;
     }
 
     public int getAge() {
