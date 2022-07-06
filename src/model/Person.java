@@ -20,6 +20,10 @@ public class Person {
         this.age = age;
     }
 
+    public static boolean isYounger(Person p) {
+        return p.getAge() >= 18 && p.getAge() <= 30;
+    }
+
     public Optional<Address> getOptionalAddress() {
         return ofNullable(getAddress());
     }
