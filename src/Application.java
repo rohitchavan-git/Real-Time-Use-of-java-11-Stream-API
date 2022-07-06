@@ -10,18 +10,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.filtering;
-import static java.util.stream.Collectors.flatMapping;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 import static src.repo.PersonRepo.getPeoples;
 
 public class Application {
@@ -32,17 +27,28 @@ public class Application {
     public static void main(String[] args) {
         List<Person> peoples = getPeoples();
 
-        // city wise grp by and find how many peoples in each city start with 'O'
+        // max person by age per first name character
 
-        List<String> listOfCity  = peoples.stream()
-                                            .map(Person::getAddress)
-                                            .filter(Objects::nonNull)
-                                            .map(Address::getCity)
-                                            .filter(Objects::nonNull)
-                                        .collect(toList());
+        Function<Person, Character> personCharacterFunction = person1 -> ofNullable(person1.getFname())
+                .map(name -> name.charAt(0)).orElse(null);
 
-        System.out.println(listOfCity);
+        Comparator<Person> compareByAge = Comparator.comparing(Person::getAge);
 
+        Map<Character, Person> characterOptionalMap = peoples.stream()
+                .collect(groupingBy(personCharacterFunction,
+                        collectingAndThen(reducing(BinaryOperator.maxBy(compareByAge)),
+                                person -> person.orElse(null))));
+        System.out.println(characterOptionalMap);
+
+
+    }
+
+    private static List<String> getListOfNonNullCity(List<Person> peoples) {
+        return peoples.stream()
+                    .map(Person::getAddress)
+                    .map(Address::getCity)
+                    .filter(Objects::nonNull)
+                    .collect(toList());
     }
 
     private static Person getMAXByAge(List<Person> peoples) {
