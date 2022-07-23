@@ -3,17 +3,10 @@ package src;
 import src.model.Address;
 import src.model.Person;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
@@ -21,8 +14,8 @@ import static src.repo.PersonRepo.getPeoples;
 
 public class Application {
 
+    private static final String STARWITHR = "r";
     private static final String OSMANABAD = "Osmanabad";
-    private static final String STARTING_WITH_R = "r";
 
     public static void main(String[] args) {
         List<Person> peoples = getPeoples();
@@ -34,6 +27,20 @@ public class Application {
                                 .map(name -> name.charAt(0))
                                 .orElse(null);
 
+
+        Function<Person,String> getCity= person ->
+                    Optional.ofNullable(person)
+                            .flatMap(Person::getOptionalAddress)
+                            .map(Address::getCity)
+                            .orElse(null);
+
+
+        List<String> collect = peoples.stream()
+                .map(p -> ofNullable(p.getAddress())
+                        .map(Address::getCity))
+                .flatMap(Optional::stream)
+                .collect(toList());
+
         Comparator<Person> compareByAge = Comparator.comparing(Person::getAge);
 
         Map<Character, Person> characterOptionalMap = peoples.stream()
@@ -42,8 +49,8 @@ public class Application {
                                 person -> person.orElse(null))));
         System.out.println(characterOptionalMap);
 
-
     }
+
 
     private static List<String> getListOfNonNullCity(List<Person> peoples) {
         return peoples.stream()
@@ -71,7 +78,7 @@ public class Application {
         System.out.println(peoples.stream()
                 .collect(groupingBy(Person::getAge,
                         mapping(Person::getFname,
-                                filtering(name->name.startsWith(STARTING_WITH_R),
+                                filtering(name->name.startsWith(STARWITHR),
                                         toList())))));
     }
 
@@ -83,16 +90,17 @@ public class Application {
 
     private static Set<String> getListOfCity(List<Person> peoples) {
 
+        Function<Person, Optional<String>> getOptionalPerson = person1 -> ofNullable(person1)
+                .flatMap(Person::getOptionalAddress)
+                .map(Address::getCity);
         return peoples.stream()
-                            .map(person -> ofNullable(person)
-                                    .flatMap(Person::getOptionalAddress )
-                                    .map(Address::getCity))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                      .collect(toSet());
+                            .map(getOptionalPerson)
+                            .flatMap(Optional::stream)
+                            .collect(toSet());
     }
 
     private static List<Person> getListOfPersonTryLiveInOsmanabad(List<Person> peoples) {
+
         Predicate<Person> personPredicate = person1 -> ofNullable(person1)
                 .flatMap(Person::getOptionalAddress)
                 .map(Address::getCity)
