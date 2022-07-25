@@ -4,134 +4,112 @@ import src.model.Address;
 import src.model.Person;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static src.repo.PersonRepo.getPeoples;
 
 public class Application {
 
-    private static final String STARWITHR = "r";
-    private static final String OSMANABAD = "Osmanabad";
+    private static final String OSMANABAD = "OSMANABAD";
+    private static final String STARTWITHR = "R";
 
     public static void main(String[] args) {
         List<Person> peoples = getPeoples();
 
-        // max person by age per first name character
-
-        Function<Person, Character> personCharacterFunction =
-                person1 -> ofNullable(person1.getFname())
-                                .map(name -> name.charAt(0))
-                                .orElse(null);
+        // collector => toList,toSet,toMap(), grouppingby()  , joining , mapping , flatmapping
+        // ,filterring , collectingAndThen
+        //counting ,teeing
 
 
-        Function<Person,String> getCity= person ->
-                    Optional.ofNullable(person)
-                            .flatMap(Person::getOptionalAddress)
-                            .map(Address::getCity)
-                            .orElse(null);
+        Map<Integer, List<Person>> collect = peoples.stream()
+                .filter(p -> p.getAge() != 0)
+                .collect(groupingBy(Person::getAge));
 
+        Map<Integer, Set<Person>> collect1 = peoples.stream()
+                .filter(p -> p.getAge() != 0)
+                .collect(groupingBy(Person::getAge, toSet()));
+
+        Map<Integer, Long> collect3 = peoples.stream()
+                .filter(p -> p.getAge() != 0)
+                .collect(groupingBy(Person::getAge, counting()));
+
+
+        Map<Integer, Integer> collect4 = peoples.stream()
+                .filter(p -> p.getAge() != 0)
+                .collect(groupingBy(Person::getAge,
+                        collectingAndThen(counting(),
+                                    Long::intValue)));
+
+        Map<Integer, List<String>> collect2 = peoples.stream()
+                .filter(p -> p.getAge() != 0)
+                .collect(groupingBy(Person::getAge,
+                        mapping(Person::getFname, toList())));
+
+        Map<Integer, List<String>> collect5 = peoples.stream()
+                .filter(p -> p.getAge() != 0)
+                .collect(groupingBy(Person::getAge,
+                            mapping(Person::getFname,
+                                filtering(STARTWITHR::startsWith,
+                                        toList()))));
+
+
+        List<Address> addresses = peoples.stream()
+                .map(Person::getAddress)
+                .collect(collectingAndThen(toList(), p -> p.stream()
+                        .filter(p1 -> p1.getCity().equalsIgnoreCase("O"))
+                        .collect(toList())));
+
+
+        Map<Boolean, List<Person>> collect6 = peoples.stream()
+                .collect(partitioningBy(p -> p.getAge() % 2 == 0));
+
+
+
+
+        // groupBy(Function f, Collector t)
+        //mapping(function , collector)
+        //flatMApping(function , collector)
+        //filtering(function , collector)
+        // collectingAndThen(Collector , Function)
+        // teeing(collector , collector , Bifunction)
+
+
+    }
+
+    private static void getALlNumbers(List<Person> peoples) {
+        List<Integer> integers = peoples.stream()
+                .map(Person::getPhoneNumber)
+                .flatMap(List::stream)
+                .collect(toList());
+    }
+
+    private static List<Person> getCityOSMANA(List<Person> peoples) {
+        Predicate<Person> checkNullOrNot=
+                        person -> Optional.ofNullable(person.getAddress())
+                                            .map(Address::getCity)
+                                            .filter(OSMANABAD::equalsIgnoreCase)
+                                          .isPresent();
+
+
+        List<Person> personList = peoples.stream()
+                .filter(checkNullOrNot)
+                .collect(toList());
+        return personList;
+    }
+
+    private static List<String> getCity(List<Person> peoples) {
+        // get city
 
         List<String> collect = peoples.stream()
-                .map(p -> ofNullable(p.getAddress())
-                        .map(Address::getCity))
-                .flatMap(Optional::stream)
-                .collect(toList());
-
-        Comparator<Person> compareByAge = Comparator.comparing(Person::getAge);
-
-        Map<Character, Person> characterOptionalMap = peoples.stream()
-                .collect(groupingBy(personCharacterFunction,
-                        collectingAndThen(reducing(BinaryOperator.maxBy(compareByAge)),
-                                person -> person.orElse(null))));
-        System.out.println(characterOptionalMap);
-
-    }
-
-
-    private static List<String> getListOfNonNullCity(List<Person> peoples) {
-        return peoples.stream()
-                    .map(Person::getAddress)
-                    .map(Address::getCity)
-                    .filter(Objects::nonNull)
-                    .collect(toList());
-    }
-
-    private static Person getMAXByAge(List<Person> peoples) {
-        return peoples.stream()
-                .max(Comparator.comparing(Person::getAge))
-                .orElse(null);
-    }
-
-    private static Map<Integer, Set<Integer>> getIntegerSetMap(List<Person> peoples) {
-        return peoples.stream()
-                .collect(groupingBy(Person::getAge,
-                        filtering(p -> p.getPhoneNumber() != null,
-                                flatMapping(p -> p.getPhoneNumber().stream(), toSet()))));
-
-    }
-
-    private static void grpByAgeThenGetNameAndFilterNameStartWithR(List<Person> peoples) {
-        System.out.println(peoples.stream()
-                .collect(groupingBy(Person::getAge,
-                        mapping(Person::getFname,
-                                filtering(name->name.startsWith(STARWITHR),
-                                        toList())))));
-    }
-
-    private static Map<Integer, Integer> groupByAgeFindCount(List<Person> peoples) {
-        return peoples.stream()
-                .collect(groupingBy(Person::getAge,
-                        collectingAndThen(counting(), Long::intValue)));
-    }
-
-    private static Set<String> getListOfCity(List<Person> peoples) {
-
-        Function<Person, Optional<String>> getOptionalPerson = person1 -> ofNullable(person1)
-                .flatMap(Person::getOptionalAddress)
-                .map(Address::getCity);
-        return peoples.stream()
-                            .map(getOptionalPerson)
-                            .flatMap(Optional::stream)
-                            .collect(toSet());
-    }
-
-    private static List<Person> getListOfPersonTryLiveInOsmanabad(List<Person> peoples) {
-
-        Predicate<Person> personPredicate = person1 -> ofNullable(person1)
-                .flatMap(Person::getOptionalAddress)
+                .map(Person::getAddress)
+                .filter(Objects::nonNull)
                 .map(Address::getCity)
-                .filter(OSMANABAD::equals).isPresent();
-        return peoples.stream()
-                .filter(personPredicate)
                 .collect(toList());
+        return collect;
     }
 
-    private static LinkedHashMap<String, Integer> streamOnMapCollection() {
 
-        return sortMapByValue(Map.of("Math", 99, "sec",
-                98, "java", 96, "c++", 92, "opp", 89));
-    }
-
-    private static LinkedHashMap<String, Integer> sortMapByValue(Map<String, Integer> stringIntegerMap) {
-        return getSortedByValue(stringIntegerMap);
-    }
-
-    private static LinkedHashMap<String, Integer> getSortedByValue(Map<String, Integer> stringIntegerMap) {
-        return stringIntegerMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-    }
-
-    private Map<String, Long> grpByCityGetCount(List<Person> peoples, Predicate<Person> isCity) {
-
-        return peoples.stream()
-                        .filter(isCity)
-                        .collect(groupingBy(perosn -> perosn.getAddress().getCity()
-                            , counting()));
-    }
 }
