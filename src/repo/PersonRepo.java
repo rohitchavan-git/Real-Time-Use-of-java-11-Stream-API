@@ -15,7 +15,7 @@ public class PersonRepo {
                 aPerson().fname("Amol").lanme("gade").address(new Address("MH", "shirdi", 76549)).phoneNumber(List.of(9875, 6744)).age(25).build(),
                 aPerson().fname("ram").lanme("cena").address(new Address(null, "USA", 413501)).phoneNumber(List.of(80586, 805432)).age(43).build(),
                 aPerson().fname("randy").lanme("ortan").address(null).phoneNumber(List.of(80586, 805432)).age(32).build(),
-                aPerson().fname("rko").lanme("chavan").address(new Address("MH", null, 413501)).phoneNumber(null).age(24).build());
+                aPerson().fname("rko").lanme("chavan").address(new Address("MH", null, 413501)).phoneNumber(null).age(31).build());
     }
 
 }
