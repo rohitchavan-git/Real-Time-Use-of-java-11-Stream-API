@@ -2,6 +2,8 @@ package src;
 
 import src.model.Address;
 import src.model.Person;
+import src.service.PersonService;
+import src.service.StudentDashboard;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
@@ -18,6 +20,16 @@ public class Application {
     private static final String OSMANABAD = "Osmanabad";
 
     public static void main(String[] args) {
+
+        PersonService personService = new PersonService();
+
+        personService.filterDashboard(StudentDashboard.LIB,"rohit");
+
+
+
+    }
+
+    private static void testStream() {
         List<Person> peoples = getPeoples();
 
         // max person by age per first name character
@@ -48,7 +60,6 @@ public class Application {
                         collectingAndThen(reducing(BinaryOperator.maxBy(compareByAge)),
                                 person -> person.orElse(null))));
         System.out.println(characterOptionalMap);
-
     }
 
 
